@@ -185,24 +185,72 @@ class LLMHelper:
         )        
         functions = [
             {
-                "name": "calculate_candidate_rating",
-                "description": "Calculate a candidate's rating based on their soft skills.",
+                "name": "generate_skill_assessment_report",
+                "description": "Generate a comprehensive ML Engineer skill assessment report",
                 "parameters": {
                     "type": "object",
                     "properties": {
-                        "soft_skills": {
+                        "skills": {
                             "type": "object",
-                            "description": "Dictionary of soft skills with scores from 1-10",
                             "properties": {
-                                "communication": {"type": "number", "description": "Score for communication skills"},
-                                "teamwork": {"type": "number", "description": "Score for teamwork abilities"},
-                                "leadership": {"type": "number", "description": "Score for leadership capabilities"},
-                                "problem_solving": {"type": "number", "description": "Score for problem solving abilities"},
-                                "adaptability": {"type": "number", "description": "Score for adaptability"}
+                                "emotional_intelligence": {
+                                    "type": "object",
+                                    "properties": {
+                                        "score": {"type": "number"},
+                                        "analysis": {"type": "string"}
+                                    }
+                                },
+                                "leadership": {
+                                    "type": "object",
+                                    "properties": {
+                                        "score": {"type": "number"},
+                                        "analysis": {"type": "string"}
+                                    }
+                                },
+                                "teamwork": {
+                                    "type": "object",
+                                    "properties": {
+                                        "score": {"type": "number"},
+                                        "analysis": {"type": "string"}
+                                    }
+                                },
+                                "problem_solving": {
+                                    "type": "object",
+                                    "properties": {
+                                        "score": {"type": "number"},
+                                        "analysis": {"type": "string"}
+                                    }
+                                },
+                                "adaptability": {
+                                    "type": "object",
+                                    "properties": {
+                                        "score": {"type": "number"},
+                                        "analysis": {"type": "string"}
+                                    }
+                                },
+                                "time_management": {
+                                    "type": "object",
+                                    "properties": {
+                                        "score": {"type": "number"},
+                                        "analysis": {"type": "string"}
+                                    }
+                                }
                             }
+                        },
+                        "key_strengths": {
+                            "type": "array",
+                            "items": {"type": "string"}
+                        },
+                        "areas_for_development": {
+                            "type": "array",
+                            "items": {"type": "string"}
+                        },
+                        "recommendations": {
+                            "type": "array",
+                            "items": {"type": "string"}
                         }
                     },
-                    "required": ["soft_skills"]
+                    "required": ["skills", "key_strengths", "areas_for_development", "recommendations"]
                 }
             }
         ]
@@ -341,3 +389,52 @@ class LLMHelper:
         print('session uuid:', self.session_uuid)
 
         return sources_list, MODEL_PROMPT, response
+
+        def generate_skill_assessment_report(self, skills: dict, key_strengths: list, 
+                                          areas_for_development: list, recommendations: list) -> str:
+            """Generate a formatted skill assessment report"""
+            
+            # Calculate weighted score
+            weights = {
+                "emotional_intelligence": 0.15,
+                "leadership": 0.05,
+                "teamwork": 0.20,
+                "problem_solving": 0.30,
+                "adaptability": 0.15,
+                "time_management": 0.15
+            }
+            
+            weighted_score = sum(skills[skill]["score"] * weights[skill] for skill in skills)
+            
+            # Format the report
+            report = "### ML Engineer Skill Assessment Report\n\n"
+            
+            # Add individual skill assessments
+            for skill, data in skills.items():
+                skill_name = skill.replace("_", " ").title()
+                report += f"{skill_name} (Weight: {weights[skill]*100}%)\n"
+                report += f"Score: {data['score']}/10\n"
+                report += f"Analysis: {data['analysis']}\n\n"
+            
+            # Add overall score
+            report += f"### Overall Assessment\n\n"
+            report += f"Overall Weighted Score: {weighted_score:.1f}/10\n\n"
+            
+            # Add strengths
+            report += "### Key Strengths\n"
+            for strength in key_strengths:
+                report += f"• {strength}\n"
+            report += "\n"
+            
+            # Add development areas
+            report += "### Areas for Development\n"
+            for area in areas_for_development:
+                report += f"• {area}\n"
+            report += "\n"
+            
+            # Add recommendations
+            report += "### Recommendations\n"
+            for rec in recommendations:
+                report += f"• {rec}\n"
+            
+            return report
