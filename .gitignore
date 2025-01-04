@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -171,6 +172,8 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 =======
+=======
+>>>>>>> 0a73070 (Initial commit)
 # Logs
 logs
 *.log
@@ -197,5 +200,9 @@ dist-ssr
 *.sw?
 
 __pycache__
+<<<<<<< HEAD
+*.pyc
+>>>>>>> 0a73070 (Initial commit)
+=======
 *.pyc
 >>>>>>> 0a73070 (Initial commit)
