@@ -1,0 +1,4 @@
+{
+    "qna_role": "Responde la pregunta basándote únicamente en el siguiente contexto:\n\n",
+    "qna_sources": "INICIO DE LA BASE DE CONOCIMIENTOS:\n\n{sources}\n\nFIN DE LA BASE DE CONOCIMIENTOS\nSi te falta información para responder, es muy importante que no inventes ningún dato y comuniques que no tienes suficiente información para responder."
+}
