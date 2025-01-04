@@ -1,0 +1,57 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    entrypoint: bash entrypoint.sh
+    command: uvicorn app:app --reload --host 0.0.0.0 --port 8000
+    volumes:
+      - ./backend:/home/raytell/app
+    ports:
+      - "8000:8000"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+      - 4.4.4.4
+    environment:
+      ENV: DEV
+    # env_file:
+    #   - .env
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "5173:5173"
+    command: npm run dev
+    volumes:
+      - ./frontend/src:/app/src
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: watchmedo auto-restart --directory=./ --pattern=tasks.py --recursive -- python3 -m celery -A tasks worker --loglevel=INFO -E
+    volumes:
+      - ./backend:/home/raytell/app
+    dns:
+     - 8.8.8.8
+     - 8.8.4.4
+     - 4.4.4.4
+    environment:
+      ENV: DEV
+  postgresql:
+    image: postgres:16.0
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: raytell
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: raytell-db
+  redis:
+    image: redis:6.2.6
+    ports:
+      - "6379:6379"
+volumes:
+  postgresql:

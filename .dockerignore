@@ -1,0 +1,10 @@
+backend/settings/local*.py
+backend/cloud-sql-proxy
+backend/venv
+backend/__pycache__
+
+frontend/dist
+frontend/.vite
+frontend/node_modules
+
+**/.idea
