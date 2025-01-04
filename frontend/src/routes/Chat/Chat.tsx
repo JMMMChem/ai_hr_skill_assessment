@@ -14,100 +14,124 @@ import { Message, ChatResponse } from "../../interfaces";
 import LoadingMessage from "./components/LoadingMessage";
 
 function formatMessageContent(content: string): JSX.Element {
-  // Check if this is a final report (contains "comprehensive skill evaluation")
-  if (content.includes("comprehensive skill evaluation")) {
+  // Helper function to format text with bold sections
+  const formatBoldText = (text: string) => {
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        // Remove ** and render as bold
+        return (
+          <Text
+            as="span"
+            key={i}
+            fontWeight="700"
+            color="white"
+          >
+            {part.slice(2, -2)}
+          </Text>
+        );
+      }
+      return <Text as="span" key={i}>{part}</Text>;
+    });
+  };
+
+  // Check if this is a final report
+  if (content.includes("Emotional Intelligence") && content.includes("Score:")) {
     const sections = content.split('\n\n');
     return (
       <Box>
         {sections.map((section, index) => {
+          // Format skill sections (those with scores)
           if (section.includes("Score:")) {
-            // Format skill sections
-            const [skillName, ...rest] = section.split('\n');
+            const lines = section.split('\n');
+            const title = lines[0];
+            const scoreAndAnalysis = lines.slice(1);
+            
             return (
-              <Box key={index} mb={4}>
+              <Box key={index} mb={6}>
                 <Text 
                   color="#0EA5E9" 
                   fontSize="18px" 
                   fontWeight="600" 
-                  mb={2}
+                  mb={3}
                 >
-                  {skillName}
+                  {formatBoldText(title)}
                 </Text>
-                {rest.map((line, i) => {
-                  if (line.startsWith("Score:")) {
-                    return (
-                      <Text 
-                        key={`score-${i}`} 
-                        color="#06B6D4" 
-                        fontSize="16px" 
-                        fontWeight="500"
-                        mb={2}
-                      >
-                        {line}
-                      </Text>
-                    );
-                  }
-                  return (
-                    <Text 
-                      key={`analysis-${i}`} 
-                      color="whiteAlpha.800"
-                      mb={2}
-                    >
-                      {line}
-                    </Text>
-                  );
-                })}
+                {scoreAndAnalysis.map((line, i) => (
+                  <Text 
+                    key={`line-${i}`} 
+                    color={line.startsWith("Score:") ? "#06B6D4" : "whiteAlpha.800"}
+                    fontSize="16px"
+                    fontWeight={line.startsWith("Score:") ? "500" : "400"}
+                    mb={2}
+                  >
+                    {formatBoldText(line)}
+                  </Text>
+                ))}
               </Box>
             );
-          } else if (section.includes("Overall Weighted Score:")) {
-            // Format overall score section
+          }
+
+          // Format overall score section
+          if (section.includes("Overall Weighted Score")) {
             return (
               <Box 
                 key={index} 
-                mt={6} 
-                mb={4} 
+                my={6} 
                 p={4} 
                 bg="rgba(14, 165, 233, 0.1)" 
                 borderRadius="xl"
               >
                 <Text 
                   color="#0EA5E9" 
-                  fontSize="20px" 
+                  fontSize="18px" 
                   fontWeight="600"
                 >
-                  {section}
+                  {formatBoldText(section)}
                 </Text>
               </Box>
             );
-          } else if (section.includes("Key Strengths:") || section.includes("Areas for Development:")) {
-            // Format strengths and development areas
-            const [title, ...points] = section.split('\n');
+          }
+
+          // Format sections with bullet points
+          if (section.includes("•")) {
+            const lines = section.split('\n');
+            const title = lines[0];
+            const points = lines.slice(1);
+            
             return (
-              <Box key={index} mb={4}>
+              <Box key={index} mb={6}>
                 <Text 
                   color="#0EA5E9" 
                   fontSize="18px" 
                   fontWeight="600" 
-                  mb={2}
+                  mb={3}
                 >
-                  {title}
+                  {formatBoldText(title)}
                 </Text>
                 {points.map((point, i) => (
                   <Text 
                     key={`point-${i}`} 
-                    color="whiteAlpha.800" 
-                    ml={4} 
-                    mb={1}
+                    color="whiteAlpha.800"
+                    fontSize="16px"
+                    ml={4}
+                    mb={2}
                   >
-                    {point}
+                    {formatBoldText(point)}
                   </Text>
                 ))}
               </Box>
             );
           }
+
+          // Default text formatting
           return (
-            <Text key={index} mb={4} color="whiteAlpha.900">
-              {section}
+            <Text 
+              key={index} 
+              color="whiteAlpha.900"
+              mb={4}
+            >
+              {formatBoldText(section)}
             </Text>
           );
         })}
@@ -115,8 +139,16 @@ function formatMessageContent(content: string): JSX.Element {
     );
   }
 
-  // For regular messages, just return the text
-  return <Text>{content}</Text>;
+  // For regular messages
+  return (
+    <Text 
+      color="whiteAlpha.900"
+      fontSize="16px"
+      lineHeight="1.6"
+    >
+      {formatBoldText(content)}
+    </Text>
+  );
 }
 
 function Chat() {
