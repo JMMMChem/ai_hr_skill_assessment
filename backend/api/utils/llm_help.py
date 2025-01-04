@@ -34,68 +34,6 @@ class LLMHelper:
         self.chroma_helper = chroma_helper
         self.r = redis.from_url(settings.REDIS_URL)
 
-    def get_default_prompts(self):
-        """
-        Get default prompts from prompts.json
-
-        Returns:
-            role_prompt: role prompt
-            sources_prompt: sources prompt
-        """
-
-        role_prompt = "Responde la pregunta de forma agradable y exacta\n\n"
-        sources_prompt = """
-
-        Eres un asistente del sector inmobiliario. Tus funciones son resolver dudas a los clientes sobre las siguientes materias:
-
-        - Gastos e impuestos al vender una propiedad
-        - Gastos e impuestos al comprar una propiedad
-
-        A modo de resumen, los gastos e impuestos al vender una propiedad son los siguientes:
-        - Impuesto sobre el Incremento de Valor de los Terrenos de Naturaleza Urbana (Plusvalía Municipal)
-        - Impuesto sobre la Renta de las Personas Físicas (IRPF)
-        - Impuesto sobre Bienes Inmuebles (IBI)
-        - Gastos de plusvalía
-        - Gastos de cancelación de hipoteca
-        - Gastos de agencia inmobiliaria
-
-        El impuesto de Plusvalía Municipal es un impuesto que grava el incremento de valor de los terrenos de naturaleza urbana. Se calcula en función del valor catastral del terreno y del número
-        de años que han transcurrido desde la última transmisión de la propiedad. En Andalucía, el tipo impositivo es del 30%
-        del incremento de valor del terreno. 
-
-        Mientras que los gastos e impuestos al comprar una propiedad son los siguientes:
-        - Impuesto sobre Transmisiones Patrimoniales (ITP) para viviendas de segunda mano.
-        En Andalucía:
-            Tipo general: 8-10 %
-            Tipo reducido:
-            7 % para vivienda habitual de no más de 130.000 €.
-            3,5% para vivienda habitual de no más de 130.000 € destinada a un menor de 35 años, o de no más de 180.000 € destinada a una persona con discapacidad superior al 33 por ciento o miembro de una familia numerosa.
-
-        - Impuesto sobre el Valor Añadido (IVA): En el caso de vivienda nueva, se aplica el IVA, que es el mismo en todo el territorio español: el tipo reducido del 10 % 
-        con carácter general y el superreducido del 4 % 
-        en algunos casos, como la compra de una vivienda de protección oficial. 
-        La única excepción es Canarias, donde se aplica el IGIC (del 6,5 %
-          con carácter general o reducido del 3 % para vivienda social).
-        - Impuesto sobre Actos Jurídicos Documentados (AJD):
-        Ese impuesto en Andalucía es:
-            Tipo general: 1,5 %
-            Tipo reducido:
-            0,3 % para vivienda habitual de menores de 35 si no supera los 130.000 €.
-            0,1 % para familia numerosa o personas con discapacidad superior al 33 por ciento si no supera los 180.000 €.
-        - Gastos de notaría
-        - Gastos de registro de la propiedad
-        - Gastos de gestoría
-
-        Cuando pregunten por cuántos impuestos tienen que pagar, si dan cifras, dalas tu también. Si no dan cifras, no las des tú tampoco.
-
-        Tienes una fuente de conocimientos amplia.
-        
-        INICIO DE LA BASE DE CONOCIMIENTOS:\n\n{sources}\n\nFIN DE LA BASE DE CONOCIMIENTOS
-                
-        """
-
-        return role_prompt, sources_prompt
-
     def get_sources(
         self,
         user_message: str,
@@ -184,7 +122,6 @@ class LLMHelper:
             prompt: prompt to be sent to LLM
             response: dictionary with the response and the cost
         """
-        role_prompt, sources_prompt = self.get_default_prompts()
 
         sources_list, sources = self.get_sources(
             user_message
@@ -197,40 +134,15 @@ class LLMHelper:
         MODEL_PROMPT = []
 
         def calculate_candidate_rating(self, soft_skills: dict) -> dict:
-            """
-            Calculate a candidate's rating based on their soft skills.
-            
-            Args:
-                soft_skills: Dictionary containing soft skill scores
-                    Example: {
-                        "communication": 8,
-                        "teamwork": 7,
-                        "leadership": 6,
-                        "problem_solving": 8,
-                        "adaptability": 7
-                    }
-                    Each skill should be rated from 1-10
-            
-            Returns:
-                dict: Contains overall rating and individual skill ratings
-                    Example: {
-                        "overall_rating": 7.2,
-                        "strengths": ["communication", "problem_solving"],
-                        "areas_for_improvement": ["leadership"],
-                        "skill_ratings": {
-                            "communication": "Excellent",
-                            "teamwork": "Good",
-                            ...
-                        }
-                    }
-            """
-            # Weights for different skills (can be adjusted)
+            """Calculate a candidate's rating based on their soft skills."""
+            # Weights for different skills (technical role)
             weights = {
-                "communication": 0.25,
-                "teamwork": 0.2,
-                "leadership": 0.15,
-                "problem_solving": 0.25,
-                "adaptability": 0.15
+                "emotional_intelligence": 0.15,
+                "leadership": 0.05,
+                "teamwork": 0.20,
+                "problem_solving": 0.30,
+                "adaptability": 0.15,
+                "time_management": 0.15
             }
             
             # Calculate weighted average
@@ -268,90 +180,6 @@ class LLMHelper:
                 "skill_ratings": skill_ratings
             }
 
-
-        def obtener_mejor_interes_hipotecario(tipo_hipoteca):
-            """
-            Obtiene la mejor tasa hipotecaria para un préstamo desde una página web.
-
-            Args:
-                tipo_hipoteca (str): El tipo de hipoteca (fija, variable, mixta).
-
-            Returns:
-                float: La mejor tasa hipotecaria.
-            """
-            url = "https://www.helpmycash.com/api/front/comparator/products/compare/hipotecas/"
-            payload = json.dumps({
-            "page": 2,
-            "filters": None,
-            "sortOptions": {
-                "featured": "asc"
-            },
-            "layoutOptions": {
-                "mortgageAmount": 100000,
-                "term": 300
-            }
-            })
-            headers = {
-            'content-type': 'application/json',
-            'Cookie': 'XSRF-TOKEN=eyJpdiI6IkwvTDFteExVaXNSSW9za21MK3J5dFE9PSIsInZhbHVlIjoicjhNZnI0TVVLOXdFMy8yeW1YOS8wczFBL1A2RHIwSHJNQVhiN1hXaGFCR0x1QWNuQitJL2tXUVZobnVUdGFoNlh5SWFURGxyMDdkMDNtQlRNeVh3MzA1MlpRU0RRMit3ekluR29JdEVGOGVMUzQ3cUxIbE9zU0o5ZU5zQ2wxb1ciLCJtYWMiOiIwZDcyODJkNTMyZTVlYWMxZjY1NmRhZWRiZTQ5OTdlZjJkZTg5MTQ5YzVlZWJlZTI5NWQ5M2M0MWRhYjQ4NmIzIiwidGFnIjoiIn0%3D; hmc=eyJpdiI6Im9HYjhxWHVOUDVyVHlPSVlrTnFzMmc9PSIsInZhbHVlIjoiNmZoME1BQSswL2dxZUpKV0o4b0I4R1RnRWJYcXJzbVVDSzVOUVNiT1FENklDZDRUZCtHNHVrbnlISGtteFNsMFJRNlJZSzBUVHRIaGdubm9Rc0RUTXZTVmdlZWdWNW9XNW9GZExXVThaamorNzZVTWhob2s2SFMwNDlIQ2tCYVgiLCJtYWMiOiJjMjVmNmM2NWU2MDNlNjhjNzY3MzBmYWQ0Zjg5ODQ4NmViMjliYzMzMDYzYTI0MGYzZDZiOTY1YTY2NTg2MWZmIiwidGFnIjoiIn0%3D'
-            }
-
-            mortgage_type_translated = {
-                "fija": "fixed",
-                "fijo": "fixed",
-                "variable": "variable",
-                "mixta": "mixed",
-                "mixto": "mixed"
-            }
-
-            response = requests.request("POST", url, headers=headers, data=payload)
-            print(response.json())
-            filtered_hipoteca_list = [mortgage for mortgage in response.json()['products'] if mortgage['sheetInfo']['mortgageType'] == mortgage_type_translated[tipo_hipoteca]]
-            sorted_mortgage_list = sorted(filtered_hipoteca_list, key=lambda x: x['sheetInfo']['interest']['tae'])
-
-            if mortgage_type_translated[tipo_hipoteca]=='fixed':
-                best_mortgages = [
-                    {
-                        "title": mortgage['title'],
-                        "bank": mortgage['brand']['name'],
-                        "tae": mortgage['sheetInfo']['interest']['tae'],
-                        "tin": mortgage['sheetInfo']['interest']['initialInterestWithoutBonuses'],
-                    }
-                    for mortgage in sorted_mortgage_list[:2]
-                ]
-
-                return f"Las mejores hipotecas son: \n\n {best_mortgages[0]['title']} - {best_mortgages[0]['bank']} al {best_mortgages[0]['tae']}% TAE y {best_mortgages[0]['tin']}% TIN \n\n  {best_mortgages[1]['title']} - {best_mortgages[1]['bank']} al {best_mortgages[1]['tae']}% TAE y {best_mortgages[1]['tin']}% TIN"
-
-            elif mortgage_type_translated[tipo_hipoteca]=='variable':
-                best_mortgages = [
-                    {
-                        "title": mortgage['title'],
-                        "bank": mortgage['brand']['name'],
-                        "tae": mortgage['sheetInfo']['interest']['tae'],
-                        "tin": mortgage['sheetInfo']['interest']['initialInterestWithoutBonuses'],
-                        "month": mortgage['sheetInfo']['interest']['initialTerm'],
-                        "tin_after": mortgage['sheetInfo']['interest']['formattedAfterInterestWithoutBonuses'].replace(",", ".")
-                    }
-                    for mortgage in sorted_mortgage_list[:2]
-                ]
-
-                return f"Las mejores hipotecas son: \n\n {best_mortgages[0]['title']} - {best_mortgages[0]['bank']} al {best_mortgages[0]['tae']}% TAE y {best_mortgages[0]['tin']}% TIN los primeros {best_mortgages[0]['month']} meses, luego {best_mortgages[0]['tin_after']} \n\n {best_mortgages[1]['title']} - {best_mortgages[1]['bank']} al {best_mortgages[1]['tae']}% TAE y {best_mortgages[1]['tin']}% TIN los primeros {best_mortgages[1]['month']} meses, luego {best_mortgages[1]['tin_after']}"
-
-            elif mortgage_type_translated[tipo_hipoteca]=='mixed':
-                best_mortgages = [
-                    {
-                        "title": mortgage['title'],
-                        "bank": mortgage['brand']['name'],
-                        "tae": mortgage['sheetInfo']['interest']['tae'],
-                        "tin": mortgage['sheetInfo']['interest']['initialInterestWithoutBonuses'],
-                        "years": int(mortgage['sheetInfo']['interest']['initialTerm']/12),
-                        "tin_after": mortgage['sheetInfo']['interest']['formattedAfterInterestWithoutBonuses'].replace(",", ".")
-                    }
-                    for mortgage in sorted_mortgage_list[:2]
-                ]
-
-                return f"Las mejores hipotecas son: \n\n {best_mortgages[0]['title']} - {best_mortgages[0]['bank']} al {best_mortgages[0]['tae']}% TAE y {best_mortgages[0]['tin']}% TIN los primeros {best_mortgages[0]['years']} años, luego {best_mortgages[0]['tin_after']} \n\n {best_mortgages[1]['title']} - {best_mortgages[1]['bank']} al {best_mortgages[1]['tae']}% TAE y {best_mortgages[1]['tin']}% TIN los primeros {best_mortgages[1]['years']} años, luego {best_mortgages[1]['tin_after']}"
-
         client = OpenAI(
         api_key=settings.OPENAI_API_KEY,
         )        
@@ -381,35 +209,86 @@ class LLMHelper:
 
         messages = []
         message_with_sources = {
-            "role": "system",
+            "role": "system", 
             "content": f"""
-            You are an AI Skill Assessment Agent specialized in evaluating candidates' soft skills. Your role is to:
+            You are an AI Skill Assessment Agent specialized in evaluating candidates' soft skills for Machine Learning Engineering positions. 
 
-            1. Help assess candidates' soft skills through conversation
-            2. Ask relevant questions to evaluate key soft skills including:
-               - Communication
-               - Teamwork
-               - Leadership
-               - Problem Solving
-               - Adaptability
+            When the conversation starts, introduce yourself and begin the assessment:
 
-            Guidelines for assessment:
-            - Ask one question at a time
-            - Listen carefully to responses and look for specific behavioral indicators
-            - Be objective and professional in your evaluation
-            - Focus on concrete examples and past experiences
-            - Avoid leading questions
-            
-            After gathering sufficient information, you can use the calculate_candidate_rating function to generate a comprehensive assessment.
+            "Hello! I'm your AI Skill Assessment Agent. I'll be evaluating your soft skills for a Machine Learning Engineer role through a series of questions. At the end, I'll provide you with a comprehensive assessment report. Let's begin:
+
+            Could you tell me about a challenging situation at work where you had to demonstrate emotional intelligence, particularly in the context of ML project development? How did you handle the emotions involved - both yours and others'?"
+
+            Ask these questions in order, one at a time:
+
+            1. Emotional Intelligence (15%):
+            - Look for empathy, self-awareness, and emotional management in ML team contexts
+
+            2. Leadership (5%):
+            "Can you describe a time when you had to lead an ML project or mentor other data scientists/ML engineers? What was your approach and what were the results?"
+            - Look for technical leadership and team guidance
+
+            3. Teamwork (20%):
+            "Tell me about a situation where you had to collaborate with different teams (like data scientists, domain experts, or stakeholders) to solve an ML challenge. How did you ensure effective collaboration?"
+            - Look for cross-functional collaboration and communication
+
+            4. Problem-Solving (30%):
+            "Could you share an example of a complex ML engineering problem you encountered? Walk me through your problem-solving process?"
+            - Look for ML-specific analytical thinking and methodology
+
+            5. Adaptability (15%):
+            "Describe a time when you had to quickly adapt to a new ML framework, tool, or methodology. How did you handle it?"
+            - Look for technical adaptability and learning ability
+
+            6. Time Management (15%):
+            "Can you tell me about a time when you had to manage multiple ML projects or model deployments with competing deadlines? How did you prioritize?"
+            - Look for ML project management and delivery skills
+
+            After all questions are answered, provide a comprehensive assessment report following this format:
+
+            "Thank you for completing the assessment. Here's your comprehensive skill evaluation:
+
+            Emotional Intelligence (15%):
+            Score: [X]/10
+            Analysis: [Brief analysis of demonstrated skills]
+
+            Leadership (5%):
+            Score: [X]/10
+            Analysis: [Brief analysis]
+
+            Teamwork (20%):
+            Score: [X]/10
+            Analysis: [Brief analysis]
+
+            Problem-Solving (30%):
+            Score: [X]/10
+            Analysis: [Brief analysis]
+
+            Adaptability (15%):
+            Score: [X]/10
+            Analysis: [Brief analysis]
+
+            Time Management (15%):
+            Score: [X]/10
+            Analysis: [Brief analysis]
+
+            Overall Weighted Score: [Calculate final score]
+
+            Key Strengths:
+            - [List top 2-3 strengths]
+
+            Areas for Development:
+            - [List 1-2 areas for improvement]
+
+            Recommendations:
+            - [2-3 specific recommendations for improvement]"
 
             Remember to:
-            - Keep the conversation flowing naturally
-            - Be encouraging but neutral
-            - Ask for specific examples when needed
-            - Maintain professional boundaries
-            - Provide clear explanations of what you're assessing
-
-            Base your assessment on the candidate's responses and any additional context provided:
+            - Ask only ONE question at a time
+            - Wait for the candidate's response before proceeding
+            - Keep questions focused on ML engineering contexts
+            - Save all feedback for the final report
+            - Maintain a professional and encouraging tone
 
             {sources}
             """
@@ -448,8 +327,10 @@ class LLMHelper:
             
             print(f"ARGUMENTS: {list(function_args.values())}")
 
-            fuction_to_call = available_functions[function_called]
-            response_message = fuction_to_call(*list(function_args.values()))
+            if function_called == "calculate_candidate_rating":
+                response_message = calculate_candidate_rating(self, function_args["soft_skills"])
+            else:
+                response_message = llm_response.content
         else:
             response_message = llm_response.content
 

@@ -15,8 +15,8 @@ services:
       - 4.4.4.4
     environment:
       ENV: DEV
-    # env_file:
-    #   - .env
+    env_file:
+      - backend/.env
   frontend:
     build:
       context: .

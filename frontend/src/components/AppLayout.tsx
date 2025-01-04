@@ -20,7 +20,6 @@ import {
 
 import { Outlet, useLocation, Link } from "react-router-dom";
 import {
-  IconHome,
   IconLogout,
   IconMessage,
   IconMenu2,
@@ -59,7 +58,6 @@ function Navigation({ onClose = () => {} }) {
         <Avatar size="sm" icon={<IconUser />} />
         <VStack align="start" spacing={0}>
           <Text color="white" fontWeight="bold">{user?.email}</Text>
-          <Text color="whiteAlpha.700" fontSize="sm">Activo</Text>
         </VStack>
       </Flex>
       

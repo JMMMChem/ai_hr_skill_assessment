@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-# ai_hr_skill_assessment
-=======
-=======
->>>>>>> 0a73070 (Initial commit)
 # ai_hr_skill_assessment
 
 ## Setup
@@ -14,9 +8,4 @@
    OPENAI_API_KEY=your_api_key
    DATABASE_URL=your_db_url
    JWT_SECRET_KEY=your_secret_key
-<<<<<<< HEAD
    ```
->>>>>>> 0a73070 (Initial commit)
-=======
-   ```
->>>>>>> 0a73070 (Initial commit)
