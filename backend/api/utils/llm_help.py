@@ -113,7 +113,6 @@ class LLMHelper:
                                       areas_for_development: list, recommendations: list) -> str:
         """Generate a formatted skill assessment report"""
         
-        # Calculate weighted score
         weights = {
             "emotional_intelligence": 0.15,
             "leadership": 0.05,
@@ -126,33 +125,33 @@ class LLMHelper:
         weighted_score = sum(skills[skill]["score"] * weights[skill] for skill in skills)
         
         # Format the report
-        report = "### ML Engineer Skill Assessment Report\n\n"
+        report = "**ML Engineer Skill Assessment Report**\n\n"
         
         # Add individual skill assessments
         for skill, data in skills.items():
             skill_name = skill.replace("_", " ").title()
-            report += f"{skill_name} (Weight: {weights[skill]*100}%)\n"
+            report += f"**{skill_name}** (Weight: {weights[skill]*100}%)\n"
             report += f"Score: {data['score']}/10\n"
             report += f"Analysis: {data['analysis']}\n\n"
         
         # Add overall score
-        report += f"### Overall Assessment\n\n"
+        report += f"**Overall Assessment**\n\n"
         report += f"Overall Weighted Score: {weighted_score:.1f}/10\n\n"
         
         # Add strengths
-        report += "### Key Strengths\n"
+        report += "**Key Strengths**\n"
         for strength in key_strengths:
             report += f"• {strength}\n"
         report += "\n"
         
         # Add development areas
-        report += "### Areas for Development\n"
+        report += "**Areas for Development**\n"
         for area in areas_for_development:
             report += f"• {area}\n"
         report += "\n"
         
         # Add recommendations
-        report += "### Recommendations\n"
+        report += "**Recommendations**\n"
         for rec in recommendations:
             report += f"• {rec}\n"
         

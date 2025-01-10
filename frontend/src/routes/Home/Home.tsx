@@ -37,13 +37,13 @@ export default function Home() {
               lineHeight={'110%'}
               letterSpacing="tight"
             >
-              Crea tus propios{' '}
+              Assess Your{' '}
               <Text
                 as={'span'}
                 bgGradient="linear(to-r, teal.400, blue.500)"
                 bgClip="text"
               >
-                asistentes inteligentes
+                ML Engineering Skills
               </Text>
             </Heading>
             <Text
@@ -52,14 +52,14 @@ export default function Home() {
               maxW={'3xl'}
               mx="auto"
             >
-              Sube documentos y otros archivos para crear tu propio asistente. 
-              Interactúa con él y obtén respuestas precisas a tus preguntas.
+              Get a comprehensive evaluation of your Machine Learning Engineering soft skills through 
+              our AI-powered assessment platform.
             </Text>
             <Text
               color={'gray.400'}
               fontSize={{ base: 'md', md: 'lg' }}
             >
-              Y mejora tus habilidades negociadoras con nuestro entrenador de agentes.
+              Receive personalized feedback and actionable insights to advance your career.
             </Text>
           </Stack>
 
@@ -85,7 +85,7 @@ export default function Home() {
               transition="all 0.2s"
               onClick={() => navigate('/dashboard/chat')}
             >
-              Comenzar ahora
+              Start Assessment
             </Button>
           </Stack>
 

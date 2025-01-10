@@ -2,7 +2,7 @@
 
 import { ReactElement } from 'react'
 import { Box, SimpleGrid, Icon, Text, Stack, Flex } from '@chakra-ui/react'
-import { IconBook, IconMessage, IconRobot } from '@tabler/icons-react'
+import { IconBrain, IconChartBar, IconBulb } from '@tabler/icons-react'
 
 interface FeatureProps {
   title: string
@@ -67,19 +67,19 @@ export default function Sections() {
         maxW="4xl"
       >
         <Feature
-          icon={<Icon as={IconRobot} color={'teal.400'} w={10} h={10} />}
-          title={'Crea el asistente'}
-          text={'Personaliza tu asistente virtual con un nombre único y configura sus capacidades.'}
+          icon={<Icon as={IconBrain} color={'teal.400'} w={10} h={10} />}
+          title={'AI Assessment'}
+          text={'Advanced evaluation of your soft skills using state-of-the-art AI technology'}
         />
         <Feature
-          icon={<Icon as={IconBook} color={'teal.400'} w={10} h={10} />}
-          title={'Entrénalo'}
-          text={'Alimenta tu asistente con documentos y conocimientos específicos para tu negocio.'}
+          icon={<Icon as={IconChartBar} color={'teal.400'} w={10} h={10} />}
+          title={'Detailed Analysis'}
+          text={'Get comprehensive insights across six key ML Engineering competencies'}
         />
         <Feature
-          icon={<Icon as={IconMessage} color={'teal.400'} w={10} h={10} />}
-          title={'Interactúa'}
-          text={'Mantén conversaciones naturales y obtén respuestas precisas al instante.'}
+          icon={<Icon as={IconBulb} color={'teal.400'} w={10} h={10} />}
+          title={'Growth Insights'}
+          text={'Receive actionable recommendations to enhance your professional skills'}
         />
       </SimpleGrid>
     </Box>
